@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	h1{
+	color: white;
+	}
+	h3{
+	color: white;
+	}
+	body {
+	  background-color: green;
+	}
+	table, th, td 
+	{
+		border: 1px solid black;
+		background-color: red;
+	}
+	input[type = button]
+	{
+		font-family: "Lucida Handwriting";
+		background-color: yellow;
+	}
+	
+	</style>
+	<title>Project 5</title> 
+</head>
+<body onload = "setTValue()">
+	<h1> Transaction Log: </h1>
+	<!--- table declaration followed by entry of data-->
+	<table id = "Transaction table">
+			<tr>
+				<th> Select
+				<th> Trans #
+				<th> Date
+				<th> Description
+				<th> Amount
+			</tr>
+			<tr>
+				<td> <input type = "checkbox" class = "myCheck"> </td>
+				<td> <input type = "text" onload = "setTValue()"  class = "transactionum" readonly> </td>
+				<td> <input type = "date" id = "myDate"> </td>
+				<td> <input type = "text" id = "myDescription" placeholder = "Enter description"> </td>
+				<td> <input type = "number" id = "amount" class = "transactionAmount" value = 0 onchange = "addTotal()"> </td> 
+				
+			</tr>
+	</table>
+	<!---Declaration of total value and buttons-->
+	<h3 id = "totalValue"> Total amount: 0.0 </h3>
+	<input type = "button" value = "Add New Row" onclick = "genericAdd()">
+	<input type = "button" value = "Insert Row Before" onclick = "tableinsertBefore()">
+	<input type = "button" value = "Insert Row After" onclick = "insertAfter()">
+	<input type = "button" value = "Delete Selected Row" onclick = "deleteAfter()">
+</body>
+<script>
+	//list of global variables that will be continuously updated
+	var list;
+	var addlist;
+	var table;
+	var checked;
+	var checkboxes;
+	var checknext;
+	var checkednext;
+	var total = 0.0;
+	
+	//genericAdd Function
+	function genericAdd()
+	{
+		table = document.getElementById("Transaction table");	//get the current table
+		var newrow = document.createElement("tr");				//create a new table row
+		newrow.innerHTML = 
+		'<tr>'+
+		'<td> <input type = "checkbox" class = "myCheck"> </td>'+
+		'<td> <input type = "text" onload = "setTValue()" class = "transactionum" readonly> </td>'+
+		'<td> <input type = "date" id = "myDate"> </td>'+
+		'<td> <input type = "text" id = "myDescription" placeholder = "Enter description"> </td>'+
+		'<td> <input type = "number" id = "amount" class = "transactionAmount" value = 0 onchange = "addTotal()"> <br> </td>'+
+		'</tr>';
+		//make the row identical to the first row
+		
+		table.appendChild(newrow);	//add the row to the end of the table
+		setTValue();				//update the transaction value
+	}
+	
+	//tableinsertBefore Function
+	function tableinsertBefore()
+	{
+		table = document.getElementById("Transaction table");	//get the current table
+		checked = getChecked();		//find the selected row calling our getChecked function
+		if (checked)
+		{
+			//if checked is not null, create a new row and set the innerHTML
+			var newrow = document.createElement("tr");
+			newrow.innerHTML = 
+			'<tr>'+
+			'<td> <input type = "checkbox" class = "myCheck"> </td>'+
+			'<td> <input type = "text" onload = "setTValue()"  class = "transactionum" readonly> </td>'+
+			'<td> <input type = "date" id = "myDate"> </td>'+
+			'<td> <input type = "text" id = "myDescription" placeholder = "Enter description"> </td>'+
+			'<td> <input type = "number" id = "amount" class = "transactionAmount" value = 0 onchange = "addTotal()"> <br> </td>'+
+			'</tr>';
+			table.insertBefore(newrow, checked);	//insert the newrow before the checked row
+			setTValue();							//set the transaction value
+			
+		}
+	}
+		
+	//insertAfter function
+	function insertAfter()
+	{
+		table = document.getElementById("Transaction table");		//get the current table
+		checkednext = getCheckedAfter();							//get the row after the checked row
+		if (checkednext)	//if this value is not null
+		{
+			//create a new row and set the innerHTML to be the same as every other row
+			var newrow = document.createElement("tr");
+			newrow.innerHTML = 
+			'<tr>'+
+			'<td> <input type = "checkbox" class = "myCheck"> </td>'+
+			'<td> <input type = "text" onload = "setTValue()" class = "transactionum" readonly> </td>'+
+			'<td> <input type = "date" id = "myDate"> </td>'+
+			'<td> <input type = "text" id = "myDescription" placeholder = "Enter description"> </td>'+
+			'<td> <input type = "number" id = "amount" class = "transactionAmount" value = 0 onchange = "addTotal()"> <br> </td>'+
+			'</tr>';
+			table.insertBefore(newrow, checkednext);		//insert the row before the checkednext row (this will insert it after the checked row)
+			setTValue();									//update the transaction value
+		}
+	}
+	
+	//deleteAfter() function
+	function deleteAfter()
+	{
+		table = document.getElementById("Transaction table");	//get the current table
+		//get all the checkboxes from each row
+		checkboxes = document.getElementsByClassName("myCheck");
+		for (var c = 0; c < checkboxes.length; c++)
+		{
+			//go through to see if one is checked and if one is, return it
+			if (checkboxes[c].checked)
+				table.removeChild(checkboxes[c].parentElement.parentElement);	//delete the row
+				setTValue();				//update the transaction values
+				addTotal();					//recalculate the total
+		}
+	}
+	
+	//getChecked function
+	function getChecked()
+	{
+		//get all the checkboxes from each row
+		checkboxes = document.getElementsByClassName("myCheck");
+		for (var c = 0; c < checkboxes.length; c++)
+		{
+			//go through to see if one is checked and if one is, return it
+			if (checkboxes[c].checked)
+				return checkboxes[c].parentElement.parentElement;	//need to return the parent of the parent, one parent only gets the row not the table
+		}
+		
+	}
+	
+	//getCheckedAfter function
+	function getCheckedAfter()
+	{
+		//get all checkboxes from each row
+		checknext = document.getElementsByClassName("myCheck");
+		for (var c = 0; c < checknext.length; c++)
+		{
+			//if a row is checked return the row right after
+			if (checknext[c].checked)
+				return checknext[c+1].parentElement.parentElement;
+		}
+	}
+	
+	//addTotal function
+	function addTotal()
+	{
+		//get each transaction amount from the rows
+		addlist = document.getElementsByClassName("transactionAmount");
+		total = 0.0;	//reset total to 0.0
+		for(var i = 0; i < addlist.length; i++)
+		{
+			//add each amount to the total
+			total += parseFloat(addlist[i].value);
+		}
+		
+		total = total.toFixed(1);	//put the total to one decimal point
+		if(total > 0)
+		{
+			document.getElementById("totalValue").innerHTML = "Total amount: " + total;	//set the totalValue
+		}
+		else
+		{
+			document.getElementById("totalValue").innerHTML = "Total amount: 0.0";	//set the totalValue
+		}
+	}
+	
+	//setTValue function
+	function setTValue()
+	{
+		list = document.getElementsByClassName("transactionum");	//get each transaction num from the table
+		for (var i = 0; i < list.length; i++)
+		{
+			//go through and set each transaction number
+			list[i].value = "__" + parseInt(i+1) + "___";
+		}
+	}
+</script>
+
+</html>
